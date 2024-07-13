@@ -1,16 +1,5 @@
-# fhevmjs React Template
+# Pixel Fight
 
-This template can get you started with interacting with the Inco Network (currently with the Gentry Testnet) using a React application. It already has fhevmjs and a wallet connection set up.
+A simple FHE game built on Inco Network showing features of encrypted moves and true randomness.
 
-## Get Started
-
-Then install the required modules: \
-`npm install ` \
-After that run the app using: \
-`npm run dev `
-
-The app will be running on http://localhost:5173/.
-
-## Next Steps
-
-Take a look at the [Inco Network documentation](https://docs.inco.org) to learn more about all the operations you can do.
+Verified contract is on https://explorer.testnet.inco.org/address/0xaaF72412fa6b7E8fff80EBd877497A477cED6e1d?tab=contract
