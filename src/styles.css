@@ -1,6 +1,12 @@
-.selected {
-    background-color: #007bff; /* Example background color */
+.selectedBlock {
+    background-color: green; /* Example background color */
     color: white;
-    border: 1px solid #007bff;
+    border: 1px solid green;
+}
+
+.selectedAttack {
+    background-color: red; /* Example background color */
+    color: white;
+    border: 1px solid red;
   }
   

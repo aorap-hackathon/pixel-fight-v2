@@ -118,9 +118,14 @@ function PixelFight({ provider }) {
     if (single)
     try {
       const signer = await provider.getSigner();
+      const instance = await getInstance();
+      const attack = toHexString(instance.encrypt8(+selectedAttack));
+      const block = toHexString(instance.encrypt8(+selectedBlock));
+
+
       const contract = new Contract(CONTRACT_ADDRESS, PixelFightABI, signer);
       setLoading("Sending transaction...");
-      const transaction = await contract.makeMove(gameId, );
+      const transaction = await contract.makeMove(gameId, attack, block);
       console.log("Waiting for transaction validation...");
       const result = await provider.waitForTransaction(transaction.hash);
       setLoading("");
@@ -173,7 +178,7 @@ function PixelFight({ provider }) {
         </a>
       </span>
 
-      {gameStarted && (
+      {!gameStarted && (
         <div>
           <br></br>
           <Button onClick={createSingleplayerGame}>New singleplayer game</Button>
@@ -185,18 +190,18 @@ function PixelFight({ provider }) {
         </div>
       )}
 
-      {!gameStarted && (
+      {gameStarted && (
         <div>
           <span>Game Number {gameId}</span>
           <br></br>
-          <Button onClick={selectBlock(1)} style={buttonStyle} className={selectedBlock === 1 ? 'selected' : ''}>Block head</Button>
-          <Button onClick={selectAttack(1)} style={buttonStyle} className={selectedAttack === 1 ? 'selected' : ''}>Attack head</Button>
+          <Button onClick={selectBlock(1)} style={buttonStyle} className={selectedBlock === 1 ? 'selectedBlock' : ''}>Block head</Button>
+          <Button onClick={selectAttack(1)} style={buttonStyle} className={selectedAttack === 1 ? 'selectedAttack' : ''}>Attack head</Button>
           <br></br>
-          <Button onClick={selectBlock(2)} style={buttonStyle} className={selectedBlock === 2 ? 'selected' : ''}>Block body</Button>
-          <Button onClick={selectAttack(2)} style={buttonStyle} className={selectedAttack === 2 ? 'selected' : ''}>Attack body</Button>
+          <Button onClick={selectBlock(2)} style={buttonStyle} className={selectedBlock === 2 ? 'selectedBlock' : ''}>Block body</Button>
+          <Button onClick={selectAttack(2)} style={buttonStyle} className={selectedAttack === 2 ? 'selectedAttack' : ''}>Attack body</Button>
           <br></br>
-          <Button onClick={selectBlock(3)} style={buttonStyle} className={selectedBlock === 3 ? 'selected' : ''}>Block legs</Button>
-          <Button onClick={selectAttack(3)} style={buttonStyle} className={selectedAttack === 3 ? 'selected' : ''}>Attack legs</Button>
+          <Button onClick={selectBlock(3)} style={buttonStyle} className={selectedBlock === 3 ? 'selectedBlock' : ''}>Block legs</Button>
+          <Button onClick={selectAttack(3)} style={buttonStyle} className={selectedAttack === 3 ? 'selectedAttack' : ''}>Attack legs</Button>
           <br></br>
           <Button onClick={makeMove} style={buttonStyle}>Submit</Button>
         </div>
