@@ -49,16 +49,19 @@ function PixelFight({ provider }) {
       const signer = await provider.getSigner();
       const contract = new Contract(CONTRACT_ADDRESS, PixelFightABI, signer);
       setLoading("Sending transaction...");
+      console.log("Sending transaction...");
       const transaction = await contract.createGame(true);
       setLoading("Waiting for transaction validation....");
+      console.log("Waiting for transaction validation....");
       const result = await provider.waitForTransaction(transaction.hash);
       setLoading("");
+      console.log("All good");
 
       const receipt = await provider.getTransactionReceipt(transaction.hash);
 
       const iface = new Interface(PixelFightABI);
 
-      let gameId = 0;
+      let someGameId = 0;
 
       for (const log of receipt.logs) {
         const logToParse = {
@@ -67,11 +70,11 @@ function PixelFight({ provider }) {
         };
         const parsedLog = iface.parseLog(logToParse);
 
-        gameId = Number(parsedLog.args[0]);
+        someGameId = Number(parsedLog.args[0]);
       }
-      console.log('gameId');
-      console.log(gameId);
-      setGameId(gameId);
+      console.log('someGameId');
+      console.log(someGameId);
+      setGameId(someGameId);
       setSingleplayer(true);
       setGameStarted(true);
     } catch (e) {
@@ -94,7 +97,7 @@ function PixelFight({ provider }) {
 
       const iface = new Interface(PixelFightABI);
 
-      let gameId = 0;
+      let someGameId = 0;
 
       for (const log of receipt.logs) {
         const logToParse = {
@@ -103,11 +106,11 @@ function PixelFight({ provider }) {
         };
         const parsedLog = iface.parseLog(logToParse);
 
-        gameId = Number(parsedLog.args[0]);
+        someGameId = Number(parsedLog.args[0]);
       }
       console.log('gameId');
-      console.log(gameId);
-      setGameId(gameId);
+      console.log(someGameId);
+      setGameId(someGameId);
     } catch (e) {
       console.log(e);
     }
@@ -115,16 +118,16 @@ function PixelFight({ provider }) {
 
   const makeMove = async (event) => {
     console.log('MAKE MOVE');
-    if (single)
     try {
       const signer = await provider.getSigner();
       const instance = await getInstance();
-      const attack = toHexString(instance.encrypt8(+selectedAttack));
-      const block = toHexString(instance.encrypt8(+selectedBlock));
+      const attack = instance.encrypt8(+selectedAttack);
+      const block = instance.encrypt8(+selectedBlock);
 
 
       const contract = new Contract(CONTRACT_ADDRESS, PixelFightABI, signer);
       setLoading("Sending transaction...");
+      console.log(gameId);
       const transaction = await contract.makeMove(gameId, attack, block);
       console.log("Waiting for transaction validation...");
       const result = await provider.waitForTransaction(transaction.hash);
@@ -134,20 +137,21 @@ function PixelFight({ provider }) {
 
       const iface = new Interface(PixelFightABI);
 
-      let gameId = 0;
-
       for (const log of receipt.logs) {
         const logToParse = {
           topics: [...log.topics], // Spread to a new array to make it mutable
           data: log.data,
         };
         const parsedLog = iface.parseLog(logToParse);
+        console.log(parsedLog.name);
+        console.log(parsedLog.args);
 
-        gameId = Number(parsedLog.args[0]);
+        if (parsedLog.name === "RoundEnded") {
+          // replace with your event's name
+          setPlayer1HP(Number(parsedLog.args[1]));
+          setPlayer2HP(Number(parsedLog.args[2]));
+        }
       }
-      console.log('gameId');
-      console.log(gameId);
-      setGameId(gameId);
     } catch (e) {
       console.log(e);
     }
@@ -161,7 +165,8 @@ function PixelFight({ provider }) {
     setSelectedAttack(attackId);
   };
 
-  const buttonStyle = { marginLeft: '200px', marginRight: '200px' };
+  const buttonStyle = { marginLeft: '150px', marginRight: '150px' };
+  const spanStyle = {marginLeft: '50px', marginRight: '50px'};
 
   return (
     <div>
@@ -184,7 +189,7 @@ function PixelFight({ provider }) {
           <Button onClick={createSingleplayerGame}>New singleplayer game</Button>
           <Button onClick={createMultiplayerGame}>New 2 players game</Button>
           <br></br>
-          <input name="gameId" />
+          <input name="game" />
           <Button>Join game</Button>
           <br></br>
         </div>
@@ -192,7 +197,10 @@ function PixelFight({ provider }) {
 
       {gameStarted && (
         <div>
-          <span>Game Number {gameId}</span>
+          <span style={spanStyle}>Game Number {gameId}</span>
+          <br></br>
+          <span style={buttonStyle}>Your HP {player1HP}</span>
+          <span style={buttonStyle}>Enemy HP {player2HP}</span>
           <br></br>
           <Button onClick={selectBlock(1)} style={buttonStyle} className={selectedBlock === 1 ? 'selectedBlock' : ''}>Block head</Button>
           <Button onClick={selectAttack(1)} style={buttonStyle} className={selectedAttack === 1 ? 'selectedAttack' : ''}>Attack head</Button>
