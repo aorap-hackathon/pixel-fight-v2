@@ -5,6 +5,7 @@ import { init, getInstance } from "./utils/fhevm";
 import { toHexString } from "./utils/utils";
 import { Connect } from "./Connect";
 import { Contract, Interface } from "ethers";
+import './styles.css'; // Import your CSS file for styles
 import PixelFightABI from "./abi/pixelFightABI";
 
 const CONTRACT_ADDRESS = "0x8a5738be1E9Ca5E33082AC2ba3bc8027D11c9946";
@@ -35,7 +36,12 @@ function PixelFight({ provider }) {
 
   const [loading, setLoading] = useState("");
   const [gameId, setGameId] = useState(0);
+  const [player1HP, setPlayer1HP] = useState(5);
+  const [player2HP, setPlayer2HP] = useState(5);
+  const [singleplayer, setSingleplayer] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [selectedBlock, setSelectedBlock] = useState(0);
+  const [selectedAttack, setSelectedAttack] = useState(0);
 
   const createSingleplayerGame = async (event) => {
     console.log('CLICKED ON SINGLEPLAYER');
@@ -66,6 +72,7 @@ function PixelFight({ provider }) {
       console.log('gameId');
       console.log(gameId);
       setGameId(gameId);
+      setSingleplayer(true);
       setGameStarted(true);
     } catch (e) {
       console.log(e);
@@ -106,6 +113,51 @@ function PixelFight({ provider }) {
     }
   };
 
+  const makeMove = async (event) => {
+    console.log('MAKE MOVE');
+    if (single)
+    try {
+      const signer = await provider.getSigner();
+      const contract = new Contract(CONTRACT_ADDRESS, PixelFightABI, signer);
+      setLoading("Sending transaction...");
+      const transaction = await contract.makeMove(gameId, );
+      console.log("Waiting for transaction validation...");
+      const result = await provider.waitForTransaction(transaction.hash);
+      setLoading("");
+
+      const receipt = await provider.getTransactionReceipt(transaction.hash);
+
+      const iface = new Interface(PixelFightABI);
+
+      let gameId = 0;
+
+      for (const log of receipt.logs) {
+        const logToParse = {
+          topics: [...log.topics], // Spread to a new array to make it mutable
+          data: log.data,
+        };
+        const parsedLog = iface.parseLog(logToParse);
+
+        gameId = Number(parsedLog.args[0]);
+      }
+      console.log('gameId');
+      console.log(gameId);
+      setGameId(gameId);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const selectBlock = (blockId) => () => {
+    setSelectedBlock(blockId);
+  };
+
+  const selectAttack = (attackId) => () => {
+    setSelectedAttack(attackId);
+  };
+
+  const buttonStyle = { marginLeft: '200px', marginRight: '200px' };
+
   return (
     <div>
       <h1>
@@ -135,13 +187,18 @@ function PixelFight({ provider }) {
 
       {!gameStarted && (
         <div>
+          <span>Game Number {gameId}</span>
           <br></br>
-          <Button onClick={createSingleplayerGame}>New singleplayer game</Button>
-          <Button onClick={createMultiplayerGame}>New 2 players game</Button>
+          <Button onClick={selectBlock(1)} style={buttonStyle} className={selectedBlock === 1 ? 'selected' : ''}>Block head</Button>
+          <Button onClick={selectAttack(1)} style={buttonStyle} className={selectedAttack === 1 ? 'selected' : ''}>Attack head</Button>
           <br></br>
-          <input name="gameId" />
-          <Button>Join game</Button>
+          <Button onClick={selectBlock(2)} style={buttonStyle} className={selectedBlock === 2 ? 'selected' : ''}>Block body</Button>
+          <Button onClick={selectAttack(2)} style={buttonStyle} className={selectedAttack === 2 ? 'selected' : ''}>Attack body</Button>
           <br></br>
+          <Button onClick={selectBlock(3)} style={buttonStyle} className={selectedBlock === 3 ? 'selected' : ''}>Block legs</Button>
+          <Button onClick={selectAttack(3)} style={buttonStyle} className={selectedAttack === 3 ? 'selected' : ''}>Attack legs</Button>
+          <br></br>
+          <Button onClick={makeMove} style={buttonStyle}>Submit</Button>
         </div>
       )}
 
