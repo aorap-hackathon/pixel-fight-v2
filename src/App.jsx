@@ -8,7 +8,7 @@ import { Contract, Interface } from "ethers";
 import './styles.css'; // Import your CSS file for styles
 import PixelFightABI from "./abi/pixelFightABI";
 
-const CONTRACT_ADDRESS = "0x8a5738be1E9Ca5E33082AC2ba3bc8027D11c9946";
+const CONTRACT_ADDRESS = "0xaaF72412fa6b7E8fff80EBd877497A477cED6e1d";
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -40,6 +40,7 @@ function PixelFight({ provider }) {
   const [player2HP, setPlayer2HP] = useState(5);
   const [singleplayer, setSingleplayer] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [gameEnded, setGameEnded] = useState(false);
   const [selectedBlock, setSelectedBlock] = useState(0);
   const [selectedAttack, setSelectedAttack] = useState(0);
 
@@ -111,6 +112,17 @@ function PixelFight({ provider }) {
       console.log('gameId');
       console.log(someGameId);
       setGameId(someGameId);
+
+          // Listen for events
+      contract.on('PlayerJoined', (from, to, value, event) => {
+        console.log('Transfer event triggered:', {
+          from: from,
+          to: to,
+          value: value.toString(),
+          data: event,
+        });
+      });
+
     } catch (e) {
       console.log(e);
     }
@@ -151,6 +163,11 @@ function PixelFight({ provider }) {
           setPlayer1HP(Number(parsedLog.args[1]));
           setPlayer2HP(Number(parsedLog.args[2]));
         }
+        if (parsedLog.name === "GameEnded") {
+          // replace with your event's name
+          setGameEnded(true);
+          setWinner(parsedLog.args[1]);
+        }
       }
     } catch (e) {
       console.log(e);
@@ -183,7 +200,7 @@ function PixelFight({ provider }) {
         </a>
       </span>
 
-      {!gameStarted && (
+      {!gameEnded && !gameStarted && (
         <div>
           <br></br>
           <Button onClick={createSingleplayerGame}>New singleplayer game</Button>
@@ -195,7 +212,7 @@ function PixelFight({ provider }) {
         </div>
       )}
 
-      {gameStarted && (
+      {!gameEnded && gameStarted && (
         <div>
           <span style={spanStyle}>Game Number {gameId}</span>
           <br></br>
