@@ -159,16 +159,6 @@ function PixelFight({ provider }) {
       setGameId(someGameId);
       setGameStarted(true);
 
-      //     // Listen for events
-      // contract.on('PlayerJoined', (from, to, value, event) => {
-      //   console.log('Transfer event triggered:', {
-      //     from: from,
-      //     to: to,
-      //     value: value.toString(),
-      //     data: event,
-      //   });
-      // });
-
     } catch (e) {
       console.log(e);
     }
