@@ -1,0 +1,257 @@
+[
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "gameId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "player1",
+                "type": "address"
+            }
+        ],
+        "name": "GameCreated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "gameId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "winner",
+                "type": "address"
+            }
+        ],
+        "name": "GameEnded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "gameId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "player",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "euint8",
+                "name": "moveAttack",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "euint8",
+                "name": "moveBlock",
+                "type": "uint256"
+            }
+        ],
+        "name": "MoveMade",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "gameId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "player2",
+                "type": "address"
+            }
+        ],
+        "name": "PlayerJoined",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "gameId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint8",
+                "name": "player1HP",
+                "type": "uint8"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint8",
+                "name": "player2HP",
+                "type": "uint8"
+            }
+        ],
+        "name": "RoundEnded",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bool",
+                "name": "singlePlayerGame",
+                "type": "bool"
+            }
+        ],
+        "name": "createGame",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "gameIdCounter",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "games",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "player1",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "player2",
+                "type": "address"
+            },
+            {
+                "internalType": "uint8",
+                "name": "player1HP",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint8",
+                "name": "player2HP",
+                "type": "uint8"
+            },
+            {
+                "internalType": "euint8",
+                "name": "player1MoveAttack",
+                "type": "uint256"
+            },
+            {
+                "internalType": "euint8",
+                "name": "player1MoveBlock",
+                "type": "uint256"
+            },
+            {
+                "internalType": "euint8",
+                "name": "player2MoveAttack",
+                "type": "uint256"
+            },
+            {
+                "internalType": "euint8",
+                "name": "player2MoveBlock",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint8",
+                "name": "roundMoves",
+                "type": "uint8"
+            },
+            {
+                "internalType": "bool",
+                "name": "singlePlayerGame",
+                "type": "bool"
+            },
+            {
+                "internalType": "bool",
+                "name": "isGameEnded",
+                "type": "bool"
+            },
+            {
+                "internalType": "address",
+                "name": "winner",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_gameId",
+                "type": "uint256"
+            }
+        ],
+        "name": "joinGame",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_gameId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes",
+                "name": "encryptedMoveAttack",
+                "type": "bytes"
+            },
+            {
+                "internalType": "bytes",
+                "name": "encryptedMoveBlock",
+                "type": "bytes"
+            }
+        ],
+        "name": "makeMove",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

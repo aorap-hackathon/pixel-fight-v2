@@ -4,6 +4,10 @@ import { Form, Button } from "react-bootstrap";
 import { init, getInstance } from "./utils/fhevm";
 import { toHexString } from "./utils/utils";
 import { Connect } from "./Connect";
+import { Contract, Interface } from "ethers";
+import PixelFightABI from "./abi/pixelFightABI";
+
+const CONTRACT_ADDRESS = "0x8a5738be1E9Ca5E33082AC2ba3bc8027D11c9946";
 
 function App() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -21,84 +25,84 @@ function App() {
   return (
     <div className="App">
       <div className="menu">
-        <Connect>{(account, provider) => <Example />}</Connect>
+        <Connect>{(account, provider) => <PixelFight provider={provider}/>}</Connect>
       </div>
     </div>
   );
 }
 
-function Example() {
-  const [amountUint8, setAmountUint8] = useState(0);
-  const [eamountUint8, setEamountUint8] = useState(0);
-  const [amountUint16, setAmountUint16] = useState(0);
-  const [eamountUint16, setEamountUint16] = useState(0);
-  const [amountUint32, setAmountUint32] = useState(0);
-  const [eamountUint32, setEamountUint32] = useState(0);
+function PixelFight({ provider }) {
 
-  const handleAmountChangeUint8 = (event) => {
-    let _instance = getInstance();
-    _instance.then((instance) => {
-      setEamountUint8(toHexString(instance.encrypt8(+event.target.value)));
-    });
-    setAmountUint8(event.target.value);
-  };
-
-  const handleCopyClickUint8 = () => {
-    if (eamountUint8) {
-      navigator.clipboard.writeText("0x" + eamountUint8);
-    }
-  };
-
-  const handleAmountChangeUint16 = (event) => {
-    let _instance = getInstance();
-    _instance.then((instance) => {
-      setEamountUint16(toHexString(instance.encrypt16(+event.target.value)));
-    });
-    setAmountUint16(event.target.value);
-  };
-
-  const handleCopyClickUint16 = () => {
-    if (eamountUint16) {
-      navigator.clipboard.writeText("0x" + eamountUint16);
-    }
-  };
-
-  const handleAmountChangeUint32 = (event) => {
-    let _instance = getInstance();
-    _instance.then((instance) => {
-      setEamountUint32(toHexString(instance.encrypt32(+event.target.value)));
-    });
-    setAmountUint32(event.target.value);
-  };
-
-  const handleCopyClickUint32 = () => {
-    if (eamountUint32) {
-      navigator.clipboard.writeText("0x" + eamountUint32);
-    }
-  };
+  const [loading, setLoading] = useState("");
+  const [gameId, setGameId] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
 
   const createSingleplayerGame = async (event) => {
     console.log('CLICKED ON SINGLEPLAYER');
-    // let _instance = getInstance();
-    // _instance.then((instance) => {
-    //   setEamountUint32(toHexString(instance.encrypt32(+event.target.value)));
-    // });
-    // setAmountUint32(event.target.value);
     try {
       const signer = await provider.getSigner();
-      const contract = new Contract(CONTRACT_ADDRESS, HiddenCardABI, signer);
-      setLoading('Encrypting "30" and generating ZK proof...');
+      const contract = new Contract(CONTRACT_ADDRESS, PixelFightABI, signer);
       setLoading("Sending transaction...");
-      const transaction = await contract.getCard();
-      setLoading("Waiting for transaction validation...");
-      await provider.waitForTransaction(transaction.hash);
-      setIsNewCard(true);
+      const transaction = await contract.createGame(true);
+      setLoading("Waiting for transaction validation....");
+      const result = await provider.waitForTransaction(transaction.hash);
       setLoading("");
-      setDialog("Card has been dealt!");
+
+      const receipt = await provider.getTransactionReceipt(transaction.hash);
+
+      const iface = new Interface(PixelFightABI);
+
+      let gameId = 0;
+
+      for (const log of receipt.logs) {
+        const logToParse = {
+          topics: [...log.topics], // Spread to a new array to make it mutable
+          data: log.data,
+        };
+        const parsedLog = iface.parseLog(logToParse);
+
+        gameId = Number(parsedLog.args[0]);
+      }
+      console.log('gameId');
+      console.log(gameId);
+      setGameId(gameId);
+      setGameStarted(true);
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const createMultiplayerGame = async (event) => {
+    console.log('CLICKED ON MULTIPLAYER');
+    try {
+      const signer = await provider.getSigner();
+      const contract = new Contract(CONTRACT_ADDRESS, PixelFightABI, signer);
+      setLoading("Sending transaction...");
+      const transaction = await contract.createGame(false);
+      console.log("Waiting for transaction validation...");
+      const result = await provider.waitForTransaction(transaction.hash);
       setLoading("");
-      setDialog("Transaction error!");
+
+      const receipt = await provider.getTransactionReceipt(transaction.hash);
+
+      const iface = new Interface(PixelFightABI);
+
+      let gameId = 0;
+
+      for (const log of receipt.logs) {
+        const logToParse = {
+          topics: [...log.topics], // Spread to a new array to make it mutable
+          data: log.data,
+        };
+        const parsedLog = iface.parseLog(logToParse);
+
+        gameId = Number(parsedLog.args[0]);
+      }
+      console.log('gameId');
+      console.log(gameId);
+      setGameId(gameId);
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -116,97 +120,31 @@ function Example() {
           Guide
         </a>
       </span>
-      <br></br>
-      <Button onClick={}>New singleplayer game</Button>
-      <Button>New 2 players game</Button>
-      <br></br>
-      {/* <input>Game</input> */}
-      <input name="gameId" />
-      <Button>Join game</Button>
-      {/* <Form className="Form-container">
-        <Form.Group className="form-group">
-          <Form.Label className="label">uint8: </Form.Label>
-          <Form.Control
-            style={{ color: "black" }}
-            type="text"
-            value={amountUint8}
-            placeholder="10"
-            onChange={handleAmountChangeUint8}
-            className="Input"
-          />
-        </Form.Group>
-        <Form.Group className="form-group">
-          <Form.Label className="label">ciphertext </Form.Label>
-          <Form.Control
-            style={{ color: "#72FF80" }}
-            type="text"
-            value={"0x" + eamountUint8}
-            disabled
-            onChange={handleAmountChangeUint8}
-            className="Input"
-          />
-          {eamountUint8 !== 0 && (
-            <Button variant="default" onClick={handleCopyClickUint8}>
-              Copy
-            </Button>
-          )}
-        </Form.Group>
-        <Form.Group className="form-group">
-          <Form.Label className="label">uint16: </Form.Label>
-          <Form.Control
-            style={{ color: "black" }}
-            type="text"
-            value={amountUint16}
-            placeholder="10"
-            onChange={handleAmountChangeUint16}
-            className="Input"
-          />
-        </Form.Group>
-        <Form.Group className="form-group">
-          <Form.Label className="label">ciphertext </Form.Label>
-          <Form.Control
-            style={{ color: "#72FF80" }}
-            type="text"
-            value={"0x" + eamountUint16}
-            disabled
-            onChange={handleAmountChangeUint16}
-            className="Input"
-          />
-          {eamountUint16 !== 0 && (
-            <Button variant="default" onClick={handleCopyClickUint16}>
-              Copy
-            </Button>
-          )}
-        </Form.Group>
-        <Form.Group className="form-group">
-          <Form.Label className="label">uint32: </Form.Label>
-          <Form.Control
-            style={{ color: "black" }}
-            type="text"
-            value={amountUint32}
-            placeholder="10"
-            onChange={handleAmountChangeUint32}
-            className="Input"
-          />
-        </Form.Group>
-        <Form.Group className="form-group">
-          <Form.Label className="label">ciphertext </Form.Label>
-          <Form.Control
-            style={{ color: "#72FF80" }}
-            type="text"
-            value={"0x" + eamountUint32}
-            disabled
-            onChange={handleAmountChangeUint32}
-            className="Input"
-          />
-          {eamountUint32 !== 0 && (
-            <Button variant="default" onClick={handleCopyClickUint32}>
-              Copy
-            </Button>
-          )}
-        </Form.Group>
-      </Form> */}
-      <br></br>
+
+      {gameStarted && (
+        <div>
+          <br></br>
+          <Button onClick={createSingleplayerGame}>New singleplayer game</Button>
+          <Button onClick={createMultiplayerGame}>New 2 players game</Button>
+          <br></br>
+          <input name="gameId" />
+          <Button>Join game</Button>
+          <br></br>
+        </div>
+      )}
+
+      {!gameStarted && (
+        <div>
+          <br></br>
+          <Button onClick={createSingleplayerGame}>New singleplayer game</Button>
+          <Button onClick={createMultiplayerGame}>New 2 players game</Button>
+          <br></br>
+          <input name="gameId" />
+          <Button>Join game</Button>
+          <br></br>
+        </div>
+      )}
+
       <span className="footer">
         Documentation:{" "}
         <a
