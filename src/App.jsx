@@ -205,6 +205,9 @@ function PixelFight({ provider }) {
           setWinner(parsedLog.args[1]);
         }
       }
+
+      setSelectedAttack(0);
+      setSelectedBlock(0);
     } catch (e) {
       console.log(e);
     }
@@ -219,6 +222,8 @@ function PixelFight({ provider }) {
   };
 
   const buttonStyle = { marginLeft: '150px', marginRight: '150px' };
+  const spanOtherStyle = { marginLeft: '150px', marginRight: '150px', fontWeight: 'bold', fontSize: 30, color: "white", textShadow: "-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black"
+ };
   const spanStyle = {marginLeft: '50px', marginRight: '50px', fontWeight: 'bold'};
 
   return (
@@ -237,7 +242,7 @@ function PixelFight({ provider }) {
       </span>
 
       {!gameEnded && !gameStarted && (
-        <div>
+        <div style={{ backgroundImage: `url(/image.webp)`, backgroundSize: "cover"}}>
           <br></br>
           <Button onClick={createSingleplayerGame}>New singleplayer game</Button>
           <Button onClick={createMultiplayerGame}>New 2 players game</Button>
@@ -249,11 +254,11 @@ function PixelFight({ provider }) {
       )}
 
       {!gameEnded && gameStarted && (
-        <div>
+        <div style={{ backgroundImage: `url(/image.webp)`, backgroundSize: "cover",}}>
           <span style={spanStyle}>Game Number {gameId}</span>
           <br></br>
-          <span style={buttonStyle}>Your HP {player1HP}</span>
-          <span style={buttonStyle}>Enemy HP {player2HP}</span>
+          <span style={spanOtherStyle}>Your HP {player1HP}</span>
+          <span style={spanOtherStyle}>Enemy HP {player2HP}</span>
           <br></br>
           <Button onClick={selectBlock(1)} style={buttonStyle} className={selectedBlock === 1 ? 'selectedBlock' : ''}>Block head</Button>
           <Button onClick={selectAttack(1)} style={buttonStyle} className={selectedAttack === 1 ? 'selectedAttack' : ''}>Attack head</Button>

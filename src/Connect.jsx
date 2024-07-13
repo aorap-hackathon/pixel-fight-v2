@@ -126,6 +126,13 @@ export const Connect = ({ children }) => {
     return <p>No wallet has been found.</p>;
   }
 
+  const displayAccount = (account) => {
+    if (!account) return '';
+    const firstPart = account.substring(0, 5);
+    const lastPart = account.substring(account.length - 5);
+    return `${firstPart}...${lastPart}`;
+  };
+
   const connectInfos = (
     <div className="Connect__info">
       {!connected && (
@@ -134,7 +141,7 @@ export const Connect = ({ children }) => {
         </button>
       )}
       {connected && (
-        <div className="Connect__account">Connected with {account}</div>
+        <div className="Connect__account">Connected with {displayAccount(account)}</div>
       )}
     </div>
   );
