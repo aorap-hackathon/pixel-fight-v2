@@ -128,6 +128,52 @@ function PixelFight({ provider }) {
     }
   };
 
+  const joinGame = async (event) => {
+    console.log('CLICKED ON JOIN GAME');
+    try {
+      const signer = await provider.getSigner();
+      const contract = new Contract(CONTRACT_ADDRESS, PixelFightABI, signer);
+      setLoading("Sending transaction...");
+      const transaction = await contract.joinGame(false);
+      console.log("Waiting for transaction validation...");
+      const result = await provider.waitForTransaction(transaction.hash);
+      setLoading("");
+
+      const receipt = await provider.getTransactionReceipt(transaction.hash);
+
+      const iface = new Interface(PixelFightABI);
+
+      let someGameId = 0;
+
+      for (const log of receipt.logs) {
+        const logToParse = {
+          topics: [...log.topics], // Spread to a new array to make it mutable
+          data: log.data,
+        };
+        const parsedLog = iface.parseLog(logToParse);
+
+        someGameId = Number(parsedLog.args[0]);
+      }
+      console.log('gameId');
+      console.log(someGameId);
+      setGameId(someGameId);
+      setGameStarted(true);
+
+      //     // Listen for events
+      // contract.on('PlayerJoined', (from, to, value, event) => {
+      //   console.log('Transfer event triggered:', {
+      //     from: from,
+      //     to: to,
+      //     value: value.toString(),
+      //     data: event,
+      //   });
+      // });
+
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   const makeMove = async (event) => {
     console.log('MAKE MOVE');
     try {
@@ -183,7 +229,7 @@ function PixelFight({ provider }) {
   };
 
   const buttonStyle = { marginLeft: '150px', marginRight: '150px' };
-  const spanStyle = {marginLeft: '50px', marginRight: '50px'};
+  const spanStyle = {marginLeft: '50px', marginRight: '50px', fontWeight: 'bold'};
 
   return (
     <div>
@@ -206,8 +252,8 @@ function PixelFight({ provider }) {
           <Button onClick={createSingleplayerGame}>New singleplayer game</Button>
           <Button onClick={createMultiplayerGame}>New 2 players game</Button>
           <br></br>
-          <input name="game" />
-          <Button>Join game</Button>
+          <input value={gameId} onChange={e => setGameId(e.target.value)}/>
+          <Button onClick={joinGame}>Join game</Button>
           <br></br>
         </div>
       )}
