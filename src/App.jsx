@@ -222,7 +222,7 @@ function PixelFight({ provider }) {
   };
 
   const buttonStyle = { marginLeft: '150px', marginRight: '150px' };
-  const spanOtherStyle = { marginLeft: '150px', marginRight: '150px', fontWeight: 'bold', fontSize: 30, color: "white", textShadow: "-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black"
+  const spanOtherStyle = { marginLeft: '150px', marginRight: '150px', fontWeight: 'bold', fontSize: 30, color: "white", textShadow: "-3px 0 black, 0 3px black, 3px 0 black, 0 -3px black"
  };
   const spanStyle = {marginLeft: '50px', marginRight: '50px', fontWeight: 'bold'};
 
