@@ -1,3 +1,4 @@
+# Project for ETHBrussel 2024
 # Pixel Fight
 
 A simple FHE game built on Inco Network showing features of encrypted moves and true randomness.
